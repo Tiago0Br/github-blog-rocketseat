@@ -1,5 +1,12 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.2.5/schema.json",
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noUnknownAtRules": "off"
+      }
+    }
+  },
   "javascript": {
     "formatter": {
       "enabled": true,
