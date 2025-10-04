@@ -28,4 +28,4 @@ Desafio do nível 3 da Formação de React da Rocketseat.
 - TailwindCSS
 - Vite
 
-Feito com 💜 &nbsp;por [Tiago Lopes](https://tiagolopes.vercel.app/) 👋
+Feito com 💜 &nbsp;por [Tiago Lopes](https://tiagolopes.bio) 👋
