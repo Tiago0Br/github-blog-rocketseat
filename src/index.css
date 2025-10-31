@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-blue: #3294F8;
+  --color-brand: #3294F8;
   --color-base-title: #E7EDF4;
   --color-base-subtitle: #C4D4E3;
   --color-base-text: #AFC2D4;
