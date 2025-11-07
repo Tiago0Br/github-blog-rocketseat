@@ -17,6 +17,7 @@
     "lucide-react": "^0.552.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-router-dom": "^7.9.5",
     "tailwindcss": "^4.1.14"
   },
   "devDependencies": {
@@ -26,6 +27,7 @@
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.0.4",
     "typescript": "~5.9.3",
-    "vite": "^7.1.9"
+    "vite": "^7.1.9",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }

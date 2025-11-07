@@ -1,8 +1,10 @@
 import { Building, Github, SquareArrowOutUpRight, Users } from 'lucide-react'
+import type React from 'react'
 import { useEffect, useState } from 'react'
-import cover from './assets/cover.png'
-import { api } from './lib/axios'
-import { dayjs } from './lib/dayjs'
+import { Header } from '@/components/header'
+import { Loading } from '@/components/loading'
+import { api } from '../lib/axios'
+import { dayjs } from '../lib/dayjs'
 
 interface GithubProfileData {
   login: string
@@ -13,22 +15,26 @@ interface GithubProfileData {
   avatar_url: string
 }
 
+interface Issue {
+  title: string
+  number: number
+  body: string
+  created_at: string
+}
+
 interface ProjectIssues {
   total_count: number
-  items: {
-    title: string
-    number: number
-    body: string
-    created_at: string
-  }[]
+  items: Issue[]
 }
 
 const perPage = 10
 
-export function App() {
+export function HomePage() {
   const [profileData, setProfileData] = useState<GithubProfileData | undefined>(undefined)
   const [projectIssues, setProjectIssues] = useState<ProjectIssues | undefined>(undefined)
+  const [filteredIssues, setFilteredIssues] = useState<Issue[]>([])
   const [pagination, setPagination] = useState(perPage)
+  const [filter, setFilter] = useState('')
 
   useEffect(() => {
     api.get('/users/Tiago0Br').then((res) => setProfileData(res.data))
@@ -39,25 +45,38 @@ export function App() {
           q: 'is:issue state:open repo:Tiago0Br/testlab',
         },
       })
-      .then((res) => setProjectIssues(res.data))
+      .then((res) => {
+        setProjectIssues(res.data)
+        setFilteredIssues(res.data.items)
+      })
   }, [])
 
   function handleShowMore() {
     setPagination((current) => current + perPage)
   }
 
+  function handleFilter(event: React.ChangeEvent<HTMLInputElement>) {
+    const value = event.target.value
+    setFilter(value)
+
+    setFilteredIssues(() => {
+      if (!projectIssues) return []
+
+      if (value.trim().length === 0) {
+        return projectIssues.items
+      }
+
+      return projectIssues.items.filter((item) =>
+        item.title.toLowerCase().includes(value.trim().toLowerCase())
+      )
+    })
+  }
+
   return (
     <>
       {profileData ? (
         <div>
-          <header className="h-[296px] w-full overflow-hidden">
-            <img
-              src={cover}
-              alt=""
-              draggable="false"
-              className="w-full h-full object-cover"
-            />
-          </header>
+          <Header />
 
           <main className="mx-auto max-w-[864px] flex flex-col items-center gap-12 pb-8">
             <div className="w-full -mt-20 bg-base-profile rounded-md flex gap-6 py-6 px-8">
@@ -118,12 +137,15 @@ export function App() {
                   type="text"
                   placeholder="Buscar conteúdo"
                   className="border border-base-border rounded-md p-2"
+                  value={filter}
+                  onChange={handleFilter}
                 />
               </div>
 
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-                {projectIssues?.items.slice(0, pagination).map((post) => (
-                  <div
+                {filteredIssues.slice(0, pagination).map((post) => (
+                  <a
+                    href={`/posts/${post.number}`}
                     key={post.number}
                     className="p-6 bg-base-post rounded-lg flex flex-col gap-2 cursor-pointer hover:bg-base-profile transition-all"
                   >
@@ -138,11 +160,11 @@ export function App() {
                     </div>
 
                     <p className="line-clamp-4">{post.body}</p>
-                  </div>
+                  </a>
                 ))}
               </div>
 
-              {projectIssues && pagination < projectIssues.items.length && (
+              {pagination < filteredIssues.length && (
                 <div>
                   <button
                     type="button"
@@ -157,9 +179,7 @@ export function App() {
           </main>
         </div>
       ) : (
-        <div className="h-screen flex items-center justify-center text-3xl">
-          Carregando...
-        </div>
+        <Loading />
       )}
     </>
   )
