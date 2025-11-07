@@ -2,6 +2,7 @@ import { Building, Github, SquareArrowOutUpRight, Users } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import cover from './assets/cover.png'
 import { api } from './lib/axios'
+import { dayjs } from './lib/dayjs'
 
 interface GithubProfileData {
   login: string
@@ -18,13 +19,16 @@ interface ProjectIssues {
     title: string
     number: number
     body: string
-    created_at: Date
+    created_at: string
   }[]
 }
+
+const perPage = 10
 
 export function App() {
   const [profileData, setProfileData] = useState<GithubProfileData | undefined>(undefined)
   const [projectIssues, setProjectIssues] = useState<ProjectIssues | undefined>(undefined)
+  const [pagination, setPagination] = useState(perPage)
 
   useEffect(() => {
     api.get('/users/Tiago0Br').then((res) => setProfileData(res.data))
@@ -37,6 +41,10 @@ export function App() {
       })
       .then((res) => setProjectIssues(res.data))
   }, [])
+
+  function handleShowMore() {
+    setPagination((current) => current + perPage)
+  }
 
   return (
     <>
@@ -95,7 +103,7 @@ export function App() {
                 </div>
               </div>
             </div>
-            <div className="w-full flex flex-col gap-10">
+            <div className="w-full flex flex-col items-center gap-10">
               <div className="flex flex-col gap-2 w-full">
                 <div className="flex justify-between w-full">
                   <strong>Publicações</strong>
@@ -114,23 +122,37 @@ export function App() {
               </div>
 
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-                {projectIssues?.items.map((post) => (
+                {projectIssues?.items.slice(0, pagination).map((post) => (
                   <div
                     key={post.number}
-                    className="p-6 bg-base-post rounded-lg flex flex-col gap-2"
+                    className="p-6 bg-base-post rounded-lg flex flex-col gap-2 cursor-pointer hover:bg-base-profile transition-all"
                   >
                     <div className="flex justify-between">
-                      <h2 className="text-xl text-base-title line-clamp-2 max-w-[300px]">
+                      <h2 className="text-xl text-base-title line-clamp-2 max-w-[270px]">
                         {post.title}
                       </h2>
 
-                      <span className="text-base-span text-sm">Há 1 dia</span>
+                      <span className="text-base-span text-sm">
+                        {dayjs(post.created_at).fromNow()}
+                      </span>
                     </div>
 
                     <p className="line-clamp-4">{post.body}</p>
                   </div>
                 ))}
               </div>
+
+              {projectIssues && pagination < projectIssues.items.length && (
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleShowMore}
+                    className="p-3 rounded-lg bg-brand text-white font-semibold cursor-pointer hover:bg-blue-400 transition-colors"
+                  >
+                    Carregar mais
+                  </button>
+                </div>
+              )}
             </div>
           </main>
         </div>
