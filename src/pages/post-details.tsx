@@ -1,4 +1,4 @@
-import { isAxiosError } from 'axios'
+import { useQuery } from '@tanstack/react-query'
 import {
   CalendarDays,
   ChevronLeft,
@@ -6,50 +6,24 @@ import {
   MessageCircle,
   SquareArrowOutUpRight,
 } from 'lucide-react'
-import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Header } from '@/components/header'
 import { Loading } from '@/components/loading'
-import { api } from '@/lib/axios'
+import { getIssueDetails } from '@/http/get-issue-details'
 import { dayjs } from '@/lib/dayjs'
-
-interface PostDetails {
-  number: number
-  title: string
-  body: string
-  user: {
-    login: string
-  }
-  comments: number
-  created_at: string
-  html_url: string
-}
 
 export function PostDetailsPage() {
   const params = useParams()
   const number = Number(params.number)
 
-  const [post, setPost] = useState<PostDetails | undefined>(undefined)
-  const [notFound, setNotFound] = useState(false)
-
   const navigate = useNavigate()
 
-  useEffect(() => {
-    async function fetchPost() {
-      try {
-        const result = await api.get(`/repos/Tiago0Br/testlab/issues/${number}`)
-        setPost(result.data)
-      } catch (error) {
-        if (isAxiosError(error)) {
-          setNotFound(true)
-        }
-      }
-    }
+  const { data: post, isLoading } = useQuery({
+    queryKey: ['get-issue-details', number],
+    queryFn: () => getIssueDetails({ project: 'Tiago0Br/testlab', issueNumber: number }),
+  })
 
-    fetchPost()
-  }, [number])
-
-  if (!post && !notFound) return <Loading />
+  if (isLoading) return <Loading />
 
   return (
     <div>
