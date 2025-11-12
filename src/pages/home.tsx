@@ -1,55 +1,35 @@
+import { useQuery } from '@tanstack/react-query'
 import { Building, Github, SquareArrowOutUpRight, Users } from 'lucide-react'
 import type React from 'react'
 import { useEffect, useState } from 'react'
 import { Header } from '@/components/header'
 import { Loading } from '@/components/loading'
-import { api } from '../lib/axios'
+import { getProfileData } from '@/http/get-profile-data'
+import { getProjectIssues, type Issue } from '@/http/get-project-issues'
 import { dayjs } from '../lib/dayjs'
-
-interface GithubProfileData {
-  login: string
-  name: string
-  bio: string
-  company: string | null
-  followers: number
-  avatar_url: string
-}
-
-interface Issue {
-  title: string
-  number: number
-  body: string
-  created_at: string
-}
-
-interface ProjectIssues {
-  total_count: number
-  items: Issue[]
-}
 
 const perPage = 10
 
 export function HomePage() {
-  const [profileData, setProfileData] = useState<GithubProfileData | undefined>(undefined)
-  const [projectIssues, setProjectIssues] = useState<ProjectIssues | undefined>(undefined)
   const [filteredIssues, setFilteredIssues] = useState<Issue[]>([])
   const [pagination, setPagination] = useState(perPage)
   const [filter, setFilter] = useState('')
 
-  useEffect(() => {
-    api.get('/users/Tiago0Br').then((res) => setProfileData(res.data))
+  const { data: profileData } = useQuery({
+    queryKey: ['get-profile-data'],
+    queryFn: getProfileData,
+  })
 
-    api
-      .get('/search/issues', {
-        params: {
-          q: 'is:issue state:open repo:Tiago0Br/testlab',
-        },
-      })
-      .then((res) => {
-        setProjectIssues(res.data)
-        setFilteredIssues(res.data.items)
-      })
-  }, [])
+  const { data: projectIssues, isLoading: isProjectIssuesLoading } = useQuery({
+    queryKey: ['get-project-issues'],
+    queryFn: () => getProjectIssues('Tiago0Br/testlab'),
+  })
+
+  useEffect(() => {
+    if (isProjectIssuesLoading === false && projectIssues !== undefined) {
+      setFilteredIssues(projectIssues.items)
+    }
+  }, [isProjectIssuesLoading, projectIssues])
 
   function handleShowMore() {
     setPagination((current) => current + perPage)
