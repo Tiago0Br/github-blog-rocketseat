@@ -3,7 +3,7 @@ import { Building, Github, SquareArrowOutUpRight, Users } from 'lucide-react'
 import type React from 'react'
 import { useEffect, useState } from 'react'
 import { Header } from '@/components/header'
-import { Loading } from '@/components/loading'
+import { Skeleton } from '@/components/ui/skeleton'
 import { getProfileData } from '@/http/get-profile-data'
 import { getProjectIssues, type Issue } from '@/http/get-project-issues'
 import { dayjs } from '../lib/dayjs'
@@ -53,114 +53,120 @@ export function HomePage() {
   }
 
   return (
-    <>
-      {profileData ? (
-        <div>
-          <Header />
+    <div>
+      <Header />
 
-          <main className="mx-auto max-w-[864px] flex flex-col items-center gap-12 pb-8">
-            <div className="w-full -mt-20 bg-base-profile rounded-md flex gap-6 py-6 px-8">
-              <div className="size-[148px]">
-                <img
-                  src={profileData.avatar_url}
-                  alt="Foto de perfil do usuário"
-                  draggable="false"
-                  className="rounded-md"
-                />
+      <main className="mx-auto max-w-[864px] flex flex-col items-center gap-12 pb-8">
+        {profileData ? (
+          <div className="w-full -mt-20 bg-base-profile rounded-md flex gap-6 py-6 px-8">
+            <div className="size-[148px]">
+              <img
+                src={profileData.avatar_url}
+                alt="Foto de perfil do usuário"
+                draggable="false"
+                className="rounded-md"
+              />
+            </div>
+
+            <div className="flex flex-col gap-5">
+              <div className="flex justify-between items-center">
+                <strong className="text-base-title text-2xl">{profileData.name}</strong>
+                <a
+                  href={`https://github.com/${profileData.login}`}
+                  target="_blank"
+                  rel="noopener"
+                  className="uppercase text-brand text-sm flex items-center gap-1.5"
+                >
+                  <span>Github</span>
+                  <SquareArrowOutUpRight className="size-3 text-brand" />
+                </a>
               </div>
 
-              <div className="flex flex-col gap-5">
-                <div className="flex justify-between items-center">
-                  <strong className="text-base-title text-2xl">{profileData.name}</strong>
-                  <a
-                    href={`https://github.com/${profileData.login}`}
-                    target="_blank"
-                    rel="noopener"
-                    className="uppercase text-brand text-sm flex items-center gap-1.5"
-                  >
-                    <span>Github</span>
-                    <SquareArrowOutUpRight className="size-3 text-brand" />
-                  </a>
-                </div>
+              <p className="text-justify line-clamp-3 max-w-[612px]">{profileData.bio}</p>
 
-                <p className="text-justify line-clamp-3 max-w-[612px]">
-                  {profileData.bio}
-                </p>
-
-                <div className="flex gap-6">
+              <div className="flex gap-6">
+                <span className="flex items-center gap-1">
+                  <Github className="size-4" /> {profileData.login}
+                </span>
+                {profileData.company && (
                   <span className="flex items-center gap-1">
-                    <Github className="size-4" /> {profileData.login}
+                    <Building className="size-4" /> {profileData.company}
                   </span>
-                  {profileData.company && (
-                    <span className="flex items-center gap-1">
-                      <Building className="size-4" /> {profileData.company}
-                    </span>
-                  )}
-                  <span className="flex items-center gap-1">
-                    <Users className="size-4" /> {profileData.followers} seguidores
-                  </span>
-                </div>
+                )}
+                <span className="flex items-center gap-1">
+                  <Users className="size-4" /> {profileData.followers} seguidores
+                </span>
               </div>
             </div>
-            <div className="w-full flex flex-col items-center gap-10">
-              <div className="flex flex-col gap-2 w-full">
-                <div className="flex justify-between w-full">
-                  <strong>Publicações</strong>
-                  {projectIssues && (
-                    <span className="text-base-span">
-                      {projectIssues.total_count} publicações
-                    </span>
-                  )}
-                </div>
-
-                <input
-                  type="text"
-                  placeholder="Buscar conteúdo"
-                  className="border border-base-border rounded-md p-2"
-                  value={filter}
-                  onChange={handleFilter}
-                />
-              </div>
-
-              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-                {filteredIssues.slice(0, pagination).map((post) => (
-                  <a
-                    href={`/posts/${post.number}`}
-                    key={post.number}
-                    className="p-6 bg-base-post rounded-lg flex flex-col gap-2 cursor-pointer hover:bg-base-profile transition-all"
-                  >
-                    <div className="flex justify-between">
-                      <h2 className="text-xl text-base-title line-clamp-2 max-w-[270px]">
-                        {post.title}
-                      </h2>
-
-                      <span className="text-base-span text-sm">
-                        {dayjs(post.created_at).fromNow()}
-                      </span>
-                    </div>
-
-                    <p className="line-clamp-4">{post.body}</p>
-                  </a>
-                ))}
-              </div>
-
-              {pagination < filteredIssues.length && (
-                <div>
-                  <button
-                    type="button"
-                    onClick={handleShowMore}
-                    className="p-3 rounded-lg bg-brand text-white font-semibold cursor-pointer hover:bg-blue-400 transition-colors"
-                  >
-                    Carregar mais
-                  </button>
-                </div>
+          </div>
+        ) : (
+          <Skeleton className="w-[624px] h-[216px] md:w-[864px] md:h-[196px] -mt-20 bg-base-profile rounded-md" />
+        )}
+        <div className="w-full flex flex-col items-center gap-10">
+          <div className="flex flex-col gap-2 w-full">
+            <div className="flex justify-between w-full">
+              <strong>Publicações</strong>
+              {projectIssues && (
+                <span className="text-base-span">
+                  {projectIssues.total_count} publicações
+                </span>
               )}
             </div>
-          </main>
+
+            <input
+              type="text"
+              placeholder="Buscar conteúdo"
+              className="border border-base-border rounded-md p-2"
+              value={filter}
+              onChange={handleFilter}
+              disabled={isProjectIssuesLoading}
+            />
+          </div>
+
+          <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+            {isProjectIssuesLoading ? (
+              <>
+                <Skeleton className="bg-base-post w-[420px] h-[184px] rounded-lg" />
+                <Skeleton className="bg-base-post w-[420px] h-[184px] rounded-lg" />
+                <Skeleton className="bg-base-post w-[420px] h-[184px] rounded-lg" />
+                <Skeleton className="bg-base-post w-[420px] h-[184px] rounded-lg" />
+              </>
+            ) : (
+              filteredIssues.slice(0, pagination).map((post) => (
+                <a
+                  href={`/posts/${post.number}`}
+                  key={post.number}
+                  className="p-6 bg-base-post rounded-lg flex flex-col gap-2 cursor-pointer hover:bg-base-profile transition-all"
+                >
+                  <div className="flex justify-between">
+                    <h2 className="text-xl text-base-title line-clamp-2 max-w-[270px]">
+                      {post.title}
+                    </h2>
+
+                    <span className="text-base-span text-sm">
+                      {dayjs(post.created_at).fromNow()}
+                    </span>
+                  </div>
+
+                  <p className="line-clamp-4">{post.body}</p>
+                </a>
+              ))
+            )}
+          </div>
+
+          {pagination < filteredIssues.length && (
+            <div>
+              <button
+                type="button"
+                onClick={handleShowMore}
+                className="p-3 rounded-lg bg-brand text-white font-semibold cursor-pointer hover:bg-blue-400 transition-colors"
+              >
+                Carregar mais
+              </button>
+            </div>
+          )}
         </div>
-      ) : (
-        <Loading />
-      )}
-    </>
+      </main>
+    </div>
   )
 }

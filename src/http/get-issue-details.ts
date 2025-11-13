@@ -1,3 +1,4 @@
+import { isAxiosError } from 'axios'
 import { api } from '@/lib/axios'
 
 interface GetIssueDetailsParams {
@@ -18,7 +19,15 @@ interface PostDetails {
 }
 
 export async function getIssueDetails({ project, issueNumber }: GetIssueDetailsParams) {
-  const response = await api.get<PostDetails>(`/repos/${project}/issues/${issueNumber}`)
+  try {
+    const response = await api.get<PostDetails>(`/repos/${project}/issues/${issueNumber}`)
 
-  return response.data
+    return response.data
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.log(error.message)
+    }
+  }
+
+  return null
 }
