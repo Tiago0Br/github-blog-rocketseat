@@ -29,7 +29,7 @@ export function PostDetailsPage() {
   return (
     <div>
       <Header />
-      <main className="mx-auto max-w-[864px] flex flex-col items-center gap-12 pb-8">
+      <main className="px-3 md:px-0 mx-auto max-w-[864px] flex flex-col items-center gap-12 pb-8">
         <div className="w-full -mt-20 bg-base-profile rounded-md flex flex-col gap-6 py-6 px-8">
           <div className="w-full flex items-center justify-between">
             <button
@@ -54,12 +54,12 @@ export function PostDetailsPage() {
 
           <div className="flex flex-col gap-4">
             {post ? (
-              <h1 className="text-3xl text-base-title">{post.title}</h1>
+              <h1 className="text-xl md:text-3xl text-base-title">{post.title}</h1>
             ) : (
               <Skeleton className="h-[36px] w-[280px]" />
             )}
 
-            <div className="flex gap-6">
+            <div className="flex flex-col md:flex-row gap-1 md:gap-6">
               <span className="flex items-center gap-1">
                 <Github className="size-4" />{' '}
                 {post ? (

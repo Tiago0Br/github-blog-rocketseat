@@ -56,10 +56,10 @@ export function HomePage() {
     <div>
       <Header />
 
-      <main className="mx-auto max-w-[864px] flex flex-col items-center gap-12 pb-8">
+      <main className="px-3 md:px-0 mx-auto max-w-[864px] flex flex-col items-center gap-12 pb-8">
         {profileData ? (
           <div className="w-full -mt-20 bg-base-profile rounded-md flex gap-6 py-6 px-8">
-            <div className="size-[148px]">
+            <div className="hidden md:block size-[148px]">
               <img
                 src={profileData.avatar_url}
                 alt="Foto de perfil do usuário"
@@ -82,9 +82,11 @@ export function HomePage() {
                 </a>
               </div>
 
-              <p className="text-justify line-clamp-3 max-w-[612px]">{profileData.bio}</p>
+              <p className="text-justify line-clamp-4 md:line-clamp-3 max-w-[612px]">
+                {profileData.bio}
+              </p>
 
-              <div className="flex gap-6">
+              <div className="flex flex-col md:flex-row gap-1 md:gap-6">
                 <span className="flex items-center gap-1">
                   <Github className="size-4" /> {profileData.login}
                 </span>
@@ -138,8 +140,8 @@ export function HomePage() {
                   key={post.number}
                   className="p-6 bg-base-post rounded-lg flex flex-col gap-2 cursor-pointer hover:bg-base-profile transition-all"
                 >
-                  <div className="flex justify-between">
-                    <h2 className="text-xl text-base-title line-clamp-2 max-w-[270px]">
+                  <div className="flex flex-col gap-1 md:flex-row md:justify-between">
+                    <h2 className="text-lg md:text-xl text-base-title line-clamp-2 md:max-w-[270px]">
                       {post.title}
                     </h2>
 
